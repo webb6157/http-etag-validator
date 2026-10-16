@@ -24,3 +24,10 @@ The deliberate scope cut: this module only implements `If-None-Match` semantics.
 The opaque-tag content is treated as opaque bytes (within the allowed ASCII range). `parse_etag` does not strip whitespace from inside the quotes: `"a b"` and `"ab"` are different tags. If your upstream generates tags with interior whitespace and you expected them trimmed, you will need to normalise before calling `parse_etag`.
 
 Empty quoted strings (`""`) are accepted as valid tags with an empty `value`. This follows the RFC grammar (`DQUOTE *etagc DQUOTE`). If your application never emits empty tags, treat an empty `value` as you would any other unexpected input.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
